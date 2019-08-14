@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.dao.RoleDao">
+
+    <select id="liebiaoRole" resultType="com.test.entity.RoleInfo">
+        select * from base_role
+    </select>
+
+    <select id="roleByPage" resultType="com.test.entity.RoleInfo">
+        select * from base_role
+        <where>
+            <if test="name!=null and name!=''">
+                and roleName like concat ('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="bangdingRole">
+        insert into base_user_role (userId,roleId) values (#{userId},#{roleId})
+    </insert>
+
+    <insert id="addRole">
+        insert into base_role (roleName,miaoShu) values (#{roleName},#{miaoShu})
+    </insert>
+
+    <delete id="delRole">
+        delete from  base_role where id=#{id}
+    </delete>
+
+    <delete id="delUserRole">
+        delete from  base_user_role where roleId=#{id}
+    </delete>
+
+    <update id="updateRole">
+        update base_role set roleName=#{roleName},miaoShu=#{miaoShu} where id=#{id}
+    </update>
+
+    <delete id="delMenuByRoleId">
+        delete from base_role_menu where roleId=#{id}
+    </delete>
+
+    <insert id="insertMenuByRoleId">
+        insert into base_role_menu(roleId,menuId) values
+        <foreach item="ids"  collection="ids"  separator=",">
+            (#{id},#{ids})
+        </foreach>
+    </insert>
+
+    <delete id="delUserByRole">
+        delete from base_user_role where userId=#{userId}
+    </delete>
+
+    <select id="findRoleByUser" resultType="com.test.entity.RoleInfo">
+        select * from base_user_role bur where bur.roleId=#{id}
+    </select>
+</mapper>

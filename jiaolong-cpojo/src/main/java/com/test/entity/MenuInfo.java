@@ -2,22 +2,20 @@ package com.test.entity;
 
 import com.test.base.BaseAuditable;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.List;
 
-/**
- * 作者: LCG
- * 日期: 2019/8/4 16:30
- * 描述:
- */
 @Entity
 @Data
 @Table(name = "base_menu")
 public class MenuInfo extends BaseAuditable {
+
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     @Column(name = "menuName")
     private String menuName;
@@ -33,5 +31,8 @@ public class MenuInfo extends BaseAuditable {
 
     @Transient
     private List<MenuInfo> menuInfoList;
+
+    @Transient
+    String roleName;
 
 }

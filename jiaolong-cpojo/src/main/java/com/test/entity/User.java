@@ -39,6 +39,12 @@ public class User {
     @Column(name = "parentId")
     Long parentId;
 
+    @Column(name = "buMen")
+    String buMen;
+
+    @Column(name = "url")
+    String url;
+
     @Transient
     List<MenuInfo> menuInfoList;
 
@@ -47,4 +53,7 @@ public class User {
 
     @Transient
     private Map<String,String> authmap;
+
+    @Transient
+    String roleName;
 }

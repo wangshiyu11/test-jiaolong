@@ -20,11 +20,15 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
+
+
 /**
  * @author ：WSY
  * @description :全局过滤器
  * @date ：Created in 2019/8/6 9:49
  */
+
+
 @Component
 public class MyGobalFilter implements GlobalFilter {
 
@@ -43,6 +47,7 @@ public class MyGobalFilter implements GlobalFilter {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
         String urlPath = request.getURI().toString();
+        String replace = urlPath.replace("http://localhost:10005/", "");
         List<String> strings = Arrays.asList(urls);
         //是否包含不需要过滤的路径
         if (strings.contains(urlPath)) {
@@ -64,7 +69,7 @@ public class MyGobalFilter implements GlobalFilter {
             //获取id
             String userid = jsonObject.get("id").toString();
             //判断权限
-            Boolean key = redisTemplate.opsForHash().hasKey("userauth" + userid, urlPath);
+            Boolean key = redisTemplate.opsForHash().hasKey("USERDATAAUTH" + userid, replace);
             if (key) {
                 return chain.filter(exchange);
             } else {

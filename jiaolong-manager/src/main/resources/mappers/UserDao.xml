@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.dao.UserDao">
+
+    <select id="userList" resultType="com.test.entity.User">
+        select bu.*,GROUP_CONCAT(br.roleName) roleName
+        from base_user bu LEFT JOIN base_user_role bur on bur.userId=bu.id
+        LEFT JOIN base_role br on br.id=bur.roleId
+        <where>
+            <if test="name!=null and name!=''">
+                and bu.userName like concat ('%',#{name},'%')
+            </if>
+            <if test="dt1!=null and dt2!='' and dt2!=null and dt2!=''">
+                and bu.birthday between #{dt1} and #{dt2}
+            </if>
+            <if test="xingbie!=null and xingbie!=''">
+                and bu.sex=#{xingbie}
+            </if>
+        </where>
+        GROUP BY bu.id
+    </select>
+
+    <delete id="del">
+        delete from base_user where id=#{id}
+    </delete>
+
+    <insert id="add">
+        insert into base_user (loginName,userName,password,sex,tel,buMen,url)
+        values(#{loginName},#{userName},#{password},#{sex},#{tel},#{buMen},#{url})
+    </insert>
+
+    <update id="update">
+        update base_user set
+        loginName=#{loginName},userName=#{userName},password=#{password},sex=#{sex},tel=#{tel},buMen=#{buMen},url=#{url}
+        where id=#{id}
+    </update>
+
+    <select id="findByloginName" resultType="com.test.entity.User">
+        select * from base_user where loginName=#{loginName}
+    </select>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.dao.MenuDao">
+    <select id="findMenu" resultType="com.test.entity.MenuInfo">
+        select * from base_menu where leval=#{leval}
+    </select>
+
+    <select id="getChildMenu" resultType="com.test.entity.MenuInfo">
+        SELECT bm.* from base_menu bm  where bm.leval=#{leval}  and  bm.parentId=#{parentId}
+    </select>
+
+    <select id="rolefindByMenu" resultType="Long">
+        select bm.id from base_menu bm
+       LEFT JOIN  base_role_menu brm on bm.id=brm.menuId where brm.roleId=#{parentId} and  bm.leval=4
+    </select>
+
+    <insert id="insertMenu">
+        insert into base_menu (menuName,url,leval,parentId) values (#{menuName},#{url},#{leval},#{parentId})
+    </insert>
+
+    <select id="findMenuByRole" resultType="com.test.entity.MenuInfo">
+        select bm.*,GROUP_CONCAT(br.roleName) roleName
+        from base_menu bm LEFT JOIN base_role_menu brm on brm.menuId=bm.id
+                          LEFT JOIN base_role br on br.id=brm.roleId where bm.id=#{id}
+    </select>
+
+    <delete id="deleteMenu">
+        delete from base_menu where id=#{id}
+    </delete>
+
+    <delete id="deleteMenuByRole">
+        delete from base_role_menu where menuId=#{id}
+    </delete>
+
+    <update id="updateMenu">
+        update base_menu set menuName=#{menuName},url=#{url} where id=#{id}
+    </update>
+</mapper>
