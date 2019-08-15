@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -99,7 +99,29 @@ public class UserController {
                     //设置成功信息
                     responseResult.setSuccess("登陆成功！^_^");
                     System.out.println("封装的返回值结果"+responseResult);
-                    return responseResult;
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+                    //获取当前时间
+                    String format = sdf.format(new Date());
+                    //自增1
+                    redisTemplate.opsForHash().increment("number",format,1l);
+                    //获取集合大小
+                    int length = redisTemplate.opsForList().range("date", 0, -1).size();
+                    //获取集合最后一个元素
+                    String date = redisTemplate.opsForList().index("date", length-1);
+                    if(date == null){
+                        redisTemplate.opsForList().leftPush("date",format);
+                    }else{
+                        if(date.equals(format)){
+
+                            redisTemplate.opsForList().rightPop("date");
+
+                            redisTemplate.opsForList().rightPush("date",format);
+
+                        }else{
+                            redisTemplate.opsForList().rightPush("date",format);
+                        }
+                    }
+                    return  responseResult;
                 }else{
                     throw new LoginException("用户名或密码错误");
                 }
@@ -150,6 +172,27 @@ public class UserController {
         ResponseResult responseResult=ResponseResult.getResponseResult();
         responseResult.setSuccess("ok");
         responseResult.setCode(200);
+        return responseResult;
+    }
+
+
+    @RequestMapping("selectzhexian")
+    @ResponseBody
+    public ResponseResult selectzhexian(){
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        Map<String,Object> map=new HashMap<>();
+        //通过索引区间返回有序集合成指定区间内的成员，其中有序集成员按分数值递增(从小到大)顺序排列
+        List<String> date = redisTemplate.opsForList().range("date", 0, -1);
+        if(date!=null){
+            List<Object> num = new ArrayList<>();
+            map.put("date",date);
+            for (String date1: date) {
+                Object number = redisTemplate.opsForHash().get("number", date1);
+                num.add(number);
+            }
+            map.put("num",num);
+        }
+        responseResult.setResult(map);
         return responseResult;
     }
 

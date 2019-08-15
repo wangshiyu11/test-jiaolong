@@ -3,7 +3,7 @@
 <mapper namespace="com.test.dao.RoleDao">
 
     <select id="liebiaoRole" resultType="com.test.entity.RoleInfo">
-        select * from base_role
+        select * from base_role where leval=#{leval} and parentId=#{parentId}
     </select>
 
     <select id="roleByPage" resultType="com.test.entity.RoleInfo">
@@ -20,7 +20,7 @@
     </insert>
 
     <insert id="addRole">
-        insert into base_role (roleName,miaoShu) values (#{roleName},#{miaoShu})
+        insert into base_role (roleName,miaoShu,leval,parentId) values (#{roleName},#{miaoShu},#{leval},#{parentId})
     </insert>
 
     <delete id="delRole">
@@ -53,4 +53,14 @@
     <select id="findRoleByUser" resultType="com.test.entity.RoleInfo">
         select * from base_user_role bur where bur.roleId=#{id}
     </select>
+
+    <select id="selectRoleByUser" resultType="com.test.entity.RoleInfo">
+        SELECT o.`id`,o.`roleName`,o.`leval` FROM base_user u
+        LEFT JOIN base_user_role r ON u.`id` = r.`userId`
+        LEFT JOIN base_role o ON r.`roleId` = o.`id` WHERE u.`id` =#{id}
+    </select>
+
+    <insert id="addRoles">
+        insert into base_role (roleName,miaoShu) values (#{roleName},#{miaoShu})
+    </insert>
 </mapper>

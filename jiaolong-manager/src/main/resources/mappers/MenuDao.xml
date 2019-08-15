@@ -6,7 +6,14 @@
     </select>
 
     <select id="getChildMenu" resultType="com.test.entity.MenuInfo">
-        SELECT bm.* from base_menu bm  where bm.leval=#{leval}  and  bm.parentId=#{parentId}
+
+        SELECT n.* FROM base_role r LEFT JOIN base_role_menu m ON r.id = m.roleId
+                                    LEFT JOIN base_menu n ON m.menuId = n.id
+        WHERE r.id = #{roleid} AND n.leval = #{leval} AND n.parentId = #{parentId}
+    </select>
+
+    <select id="getChildMenuList" resultType="com.test.entity.MenuInfo">
+        select bm.* from base_menu bm where bm.leval=#{leval} and bm.parentId=#{parentId}
     </select>
 
     <select id="rolefindByMenu" resultType="Long">

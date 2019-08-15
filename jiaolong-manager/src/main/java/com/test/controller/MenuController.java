@@ -25,8 +25,14 @@ public class MenuController {
     MenuService menuService;
 
     @RequestMapping("menuList")
-    public List<MenuInfo> menuList(){
-        List<MenuInfo> list= menuService.findMenu();
+    public List<MenuInfo> menuList(@RequestBody Map<String,Object> map ){
+        List<MenuInfo> list= menuService.findMenu(Long.valueOf(map.get("roleid").toString()));
+        return list;
+    }
+
+    @RequestMapping("menuByList")
+    public List<MenuInfo> menuByList(){
+        List<MenuInfo> list= menuService.menuByList();
         return list;
     }
 

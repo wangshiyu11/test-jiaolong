@@ -4,12 +4,21 @@ import com.github.pagehelper.PageInfo;
 import com.test.ResponseResult;
 import com.test.entity.MenuInfo;
 import com.test.entity.RoleInfo;
+import com.test.entity.User;
 import com.test.service.RoleService;
+import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,17 +71,34 @@ public class RoleController {
                 Integer.valueOf(map.get("pageSize").toString()),
                 map.get("name").toString());
 
+        //点击角色管理 直接查询当前用户所对应的角色的leval和id
+
         return pageInfo;
+    }
+
+    @RequestMapping("selectRoleByUser")
+    public RoleInfo selectRoleByUser(@RequestBody Map<String,Object> map){
+        RoleInfo roleInfo=roleService.selectRoleByUser(Long.valueOf(map.get("id").toString()));
+        System.out.println("///***0"+roleInfo);
+        return roleInfo;
     }
 
     /**
      * 角色添加
      */
     @RequestMapping("addRole")
-    public int addRole(@RequestBody RoleInfo roleInfo){
-        System.out.println("*********"+roleInfo);
-        int i=roleService.addRole(roleInfo);
-        return i;
+    public ResponseResult addRole(@RequestBody Map<String,Object> map){
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        System.out.println("*********"+map);
+        roleService.addRole(
+                map.get("roleName").toString(),
+                map.get("miaoShu").toString(),
+                Integer.valueOf(map.get("leval").toString()),
+                Integer.valueOf(map.get("parentId").toString())
+        );
+        responseResult.setSuccess("ok");
+        responseResult.setCode(200);
+        return responseResult;
     }
 
     /**
@@ -114,4 +140,5 @@ public class RoleController {
         map.put("status",200);
         return map;
     }
+
 }

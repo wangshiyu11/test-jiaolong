@@ -1,3 +1,4 @@
+
 package com.test.filter;
 
 import com.alibaba.fastjson.JSONObject;
@@ -22,11 +23,13 @@ import java.util.List;
 
 
 
+
 /**
  * @author ：WSY
  * @description :全局过滤器
  * @date ：Created in 2019/8/6 9:49
  */
+
 
 
 @Component
@@ -58,7 +61,7 @@ public class MyGobalFilter implements GlobalFilter {
             try {
                 jsonObject = JWTUtils.decodeJwtTocken(token.get(0));
                 String generateToken = JWTUtils.generateToken(jsonObject.toJSONString());
-                response.getHeaders().set("token", generateToken);
+                //response.getHeaders().set("token", generateToken);
             } catch (JwtException e) {
                 e.printStackTrace();
                 response.getHeaders().set("loginpath", loginpath);
@@ -78,3 +81,4 @@ public class MyGobalFilter implements GlobalFilter {
         }
     }
 }
+

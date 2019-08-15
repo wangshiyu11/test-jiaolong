@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.test.dao.MenuDao;
 import com.test.dao.RoleDao;
 import com.test.entity.RoleInfo;
+import com.test.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,10 +42,6 @@ public class RoleService {
         return new PageInfo<>(list);
     }
 
-    public int addRole(RoleInfo roleInfo) {
-        return roleDao.addRole(roleInfo);
-    }
-
     public void delRole(Long id) {
         roleDao.delRole(id);
     }
@@ -71,5 +68,17 @@ public class RoleService {
 
     public RoleInfo findRoleByUser(Integer id) {
         return roleDao.findRoleByUser(id);
+    }
+
+    public RoleInfo selectRoleByUser(Long id) {
+        return  roleDao.selectRoleByUser(id);
+    }
+
+    public void addRole(String roleName, String miaoShu, Integer leval, Integer parentId) {
+        roleDao.addRole(roleName,miaoShu,leval,parentId);
+    }
+
+    public void addRoles(RoleInfo roleInfo1) {
+        roleDao.addRoles(roleInfo1);
     }
 }

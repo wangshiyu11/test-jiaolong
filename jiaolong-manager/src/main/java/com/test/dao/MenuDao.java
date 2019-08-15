@@ -15,7 +15,7 @@ public interface MenuDao {
 
     List<MenuInfo> findMenu(@Param(value = "leval") int i);
 
-    List<MenuInfo> getChildMenu(@Param(value = "leval") int i,@Param(value = "parentId") Long id);
+    List<MenuInfo> getChildMenu(@Param(value = "leval") int i,@Param(value = "parentId") Long id,@Param(value = "roleid")Long roleid);
 
     List<Long> rolefindByMenu(Long id);
 
@@ -28,4 +28,7 @@ public interface MenuDao {
     void insertMenu(@Param(value = "parentId") Integer id, @Param(value = "leval") Integer leval,@Param(value = "menuName") String menuName,@Param(value = "url") String url);
 
     void updateMenu(@Param(value = "id") Integer id, @Param(value = "menuName") String menuName,@Param(value = "url") String url);
+
+    List<MenuInfo> getChildMenuList(@Param(value = "leval")int i,@Param(value = "parentId") Long id);
+
 }

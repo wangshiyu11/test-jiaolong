@@ -21,25 +21,25 @@ public class MenuService {
     @Autowired
     MenuDao menuDao;
 
-    public List<MenuInfo> findMenu() {
+    public List<MenuInfo> findMenu(Long roleid) {
 
         List<MenuInfo> menu =  menuDao.findMenu(1);
-        this.getOtherMenu(menu);
+        this.getOtherMenu(menu,roleid);
         return  menu;
 
     }
 
-    public void getOtherMenu(List<MenuInfo> menu){
+    public void getOtherMenu(List<MenuInfo> menu,Long roleid){
         for (MenuInfo  menuInfo: menu) {
-            List<MenuInfo> childMenu = menuDao.getChildMenu(menuInfo.getLeval() + 1, menuInfo.getId());
-            System.out.println("child");
+            List<MenuInfo> childMenu = menuDao.getChildMenu(menuInfo.getLeval() + 1, menuInfo.getId(),roleid);
+            /*System.out.println("child");
             childMenu.forEach(c->{
                 System.out.println(c);
-            });
+            });*/
             menuInfo.setMenuInfoList(childMenu);
 
             if(childMenu.size() > 0){
-                this.getOtherMenu(childMenu);
+                this.getOtherMenu(childMenu,roleid);
             }
         }
     }
@@ -62,5 +62,26 @@ public class MenuService {
 
     public void updateMenu(Integer id, String menuName, String url) {
         menuDao.updateMenu(id,menuName,url);
+    }
+
+    public List<MenuInfo> menuByList() {
+        List<MenuInfo> menu= menuDao.findMenu(1);
+        this.getMenu(menu);
+        return  menu;
+    }
+
+    public void getMenu(List<MenuInfo> menu){
+        for (MenuInfo  menuInfo: menu) {
+            List<MenuInfo> childMenu = menuDao.getChildMenuList(menuInfo.getLeval() + 1, menuInfo.getId());
+            /*System.out.println("child");
+            childMenu.forEach(c->{
+                System.out.println(c);
+            });*/
+            menuInfo.setMenuInfoList(childMenu);
+
+            if(childMenu.size() > 0){
+                this.getMenu(childMenu);
+            }
+        }
     }
 }

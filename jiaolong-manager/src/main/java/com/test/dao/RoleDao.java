@@ -1,6 +1,7 @@
 package com.test.dao;
 
 import com.test.entity.RoleInfo;
+import com.test.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,6 @@ public interface RoleDao {
 
     List<RoleInfo> roleByPage(@Param(value = "name")String name);
 
-    int addRole( RoleInfo roleInfo);
 
     void delRole(Long id);
 
@@ -32,4 +32,11 @@ public interface RoleDao {
     void delUserByRole(@Param(value = "userId") Long userId);
 
     RoleInfo findRoleByUser(Integer id);
+
+    RoleInfo selectRoleByUser(Long id);
+
+    void addRole(@Param(value = "roleName") String roleName,@Param(value = "miaoShu") String miaoShu,
+                 @Param(value = "leval") Integer leval,@Param(value = "parentId") Integer parentId);
+
+    void addRoles(RoleInfo roleInfo1);
 }

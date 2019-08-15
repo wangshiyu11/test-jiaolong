@@ -22,6 +22,12 @@ public class RoleInfo extends BaseAuditable {
     @Column(name = "miaoShu")
     private String miaoShu;
 
+    @Column(name = "leval")
+    int leval;
+
+    @Column(name = "parentId")
+    int parentId;
+
     @Transient
     List<Long> menuMids;
 
