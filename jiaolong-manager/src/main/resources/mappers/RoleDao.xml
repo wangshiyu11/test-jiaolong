@@ -3,7 +3,7 @@
 <mapper namespace="com.test.dao.RoleDao">
 
     <select id="liebiaoRole" resultType="com.test.entity.RoleInfo">
-        select * from base_role where leval=#{leval} and parentId=#{parentId}
+        select * from base_role
     </select>
 
     <select id="roleByPage" resultType="com.test.entity.RoleInfo">

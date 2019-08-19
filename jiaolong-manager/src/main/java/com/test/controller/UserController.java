@@ -2,6 +2,9 @@ package com.test.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.github.tobato.fastdfs.domain.StorePath;
+import com.github.tobato.fastdfs.domain.ThumbImageConfig;
+import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.test.ResponseResult;
 import com.test.entity.RoleInfo;
 import com.test.entity.User;
@@ -51,7 +54,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    String addr;
+    String imageName;
     /**
      * 获取用户列表
      */
@@ -74,18 +77,29 @@ public class UserController {
      * 上传图片
      */
 
-    @PostMapping("addPic")
-    @ApiOperation("文件上传的接口")
+    @Autowired
+    private ThumbImageConfig thumbImageConfig;
+
+    @Autowired
+    private FastFileStorageClient storageClient;
+
+    @RequestMapping("addPic")
+    @ResponseBody
+    @ApiOperation("图片上传的接口")
     public void addPic(@Param("file")MultipartFile file) throws IOException {
 
-        System.out.println("进入图片方法");
-        String imgUrl = "F:\\tu\\" + file.getOriginalFilename();
-        File file2 = new File(imgUrl);
+        StorePath storePath = this.storageClient.uploadImageAndCrtThumbImage(file.getInputStream(), file.getSize(), "png", null);
 
+        System.out.println(storePath.getFullPath());
+
+        String path = thumbImageConfig.getThumbImagePath(storePath.getPath());
+
+        System.out.println(path.substring(0,path.lastIndexOf("_")));
+        imageName=path.substring(0,path.lastIndexOf("_"));
+//        file.transferTo(file1);
+//       Thumbnails.of(file1).scale(0.25f).toFile(file1);
         //可自定义大小
-        Thumbnails.of(file2).scale(0.25f).toFile(file2.getAbsolutePath()+"_25.jpg");
-        System.out.println("图片的方法===="+file2.getAbsolutePath()+"_25.jpg");
-        this.addr =file.getOriginalFilename();
+
     }
 
 
@@ -108,6 +122,7 @@ public class UserController {
         if(user!=null){
             String password = MD5.encryptPassword(user.getPassword(), "lcg");
             user.setPassword(password);
+            user.setUrl(imageName);
             System.out.println(password);
         }else{
             System.out.println("密码保存错误");
@@ -124,6 +139,14 @@ public class UserController {
     @RequestMapping("update")
     @ResponseBody
     public int update(@RequestBody User user){
+        if(user!=null){
+            String password = MD5.encryptPassword(user.getPassword(), "lcg");
+            user.setPassword(password);
+            user.setUrl(imageName);
+            System.out.println(password);
+        }else{
+            System.out.println("密码保存错误");
+        }
         int i = userService.update(user);
         return i;
     }

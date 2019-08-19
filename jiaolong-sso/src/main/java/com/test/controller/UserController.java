@@ -9,27 +9,20 @@ import com.test.exception.LoginException;
 import com.test.jwt.JWTUtils;
 import com.test.randm.VerifyCodeUtils;
 import com.test.service.UserService;
+import com.test.util.EmailUtil;
 import com.test.utils.MD5;
 import com.test.utils.UID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -135,6 +128,146 @@ public class UserController {
     }
 
     /**
+     * 利用短信验证码进行登录
+     */
+    @RequestMapping("loginByTel")
+    @ResponseBody
+    public ResponseResult loginByTel(@RequestBody Map<String,Object> map)throws LoginException{
+        ResponseResult responseResult=ResponseResult.getResponseResult();
+        //获取生成的验证码
+        System.out.println(map.get("authcode").toString()+"*****");
+        String phone = redisTemplate.opsForValue().get("phone");
+        //获取传入的验证码是否是生成后存在redis中的验证码
+        if(phone==null||!phone.equals(map.get("authcode").toString()) ){
+            responseResult.setCode(500);
+            responseResult.setError("验证码错误,请重新刷新页面登陆");
+            return responseResult;
+        }
+       if(map.get("tel")!=null){
+           User user = userService.loginByTel(map.get("tel").toString());
+           //将用户信息转存为JSON串
+           String userinfo = JSON.toJSONString(user);
+
+           //将用户信息使用JWt进行加密，将加密信息作为票据
+           String token = JWTUtils.generateToken(userinfo);
+
+           //将加密信息存入statuInfo
+           responseResult.setToken(token);
+
+           //将生成的token存储到redis库
+           redisTemplate.opsForValue().set("USERINFO"+user.getId().toString(),token);
+           //将该用户的数据访问权限信息存入缓存中
+           redisTemplate.delete("USERDATAAUTH"+user.getId().toString());
+           redisTemplate.opsForHash().putAll("USERDATAAUTH"+user.getId().toString(),user.getAuthmap());
+
+           //设置token过期 30分钟
+           redisTemplate.expire("USERINFO"+user.getId().toString(),600,TimeUnit.SECONDS);
+           //设置返回值
+           responseResult.setResult(user);
+           responseResult.setCode(200);
+           //设置成功信息
+           responseResult.setSuccess("登陆成功！^_^");
+           System.out.println("封装的返回值结果"+responseResult);
+           return responseResult;
+       }else{
+           throw new LoginException("登录错误");
+       }
+
+    }
+
+    //获取手机验证码
+    @RequestMapping("getPhoneCode")
+    @ResponseBody
+    public ResponseResult getPhoneCode(@RequestBody Map<String,String> map){
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        String code = userService.getPhoneCode(map.get("tel"));
+        redisTemplate.opsForValue().set("phone",code);
+        redisTemplate.expire("phone",500,TimeUnit.SECONDS);
+        responseResult.setCode(200);
+        return responseResult;
+    }
+
+    //判断用户是否存在
+    @RequestMapping("findUsername")
+    @ResponseBody
+    public ResponseResult findUsername(@RequestBody Map<String,String>map){
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        User user=userService.findUsername(map.get("username"));
+        System.out.println("//"+map.get("username"));
+        if(user!=null){
+            System.out.println("------//---");
+            responseResult.setSuccess("ok");
+            responseResult.setCode(200);
+            return responseResult;
+        }else{
+            responseResult.setError("用户不存在");
+            responseResult.setCode(500);
+            return responseResult;
+        }
+    }
+
+
+    //获取邮箱验证码
+    @RequestMapping("getEmailCode")
+    @ResponseBody
+    public ResponseResult getEmailCode(@RequestBody Map<String,String> map) throws MessagingException {
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        User user = userService.getEmailCode(map.get("email"));
+        String email = map.get("email");
+        if(user!=null){
+            int num = (int) ((Math.random() * 9 + 1) * 100000);
+
+            EmailUtil.sendEmail(email,String.valueOf(num));
+
+            redisTemplate.opsForValue().set("email",String.valueOf(num));
+            redisTemplate.expire(email,500,TimeUnit.SECONDS);
+            responseResult.setCode(200);
+            return responseResult;
+
+        }else{
+            responseResult.setError("邮箱不存在");
+            responseResult.setCode(500);
+            return responseResult;
+        }
+    }
+
+    //判断邮箱验证码是否与redis中相同
+    @RequestMapping("setEmailCode")
+    @ResponseBody
+    public ResponseResult setEmailCode(@RequestBody Map<String,String> map) {
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        //获取生成的验证码
+        System.out.println(map.get("authcode")+"*****");
+        String email = redisTemplate.opsForValue().get("email");
+        if(email.equals(map.get("authcode")) ){
+            responseResult.setCode(200);
+            return responseResult;
+        }else{
+            responseResult.setCode(500);
+            return responseResult;
+        }
+    }
+
+
+    /**
+     * 修改用户密码
+     */
+    @RequestMapping("updatePassword")
+    @ResponseBody
+    public ResponseResult updatePassword(@RequestBody Map<String,String> map){
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        String password = MD5.encryptPassword(map.get("pwd"), "lcg");
+        System.out.println("++/"+password);
+        System.out.println("/*-+"+map.get("username"));
+        userService.updatePassword(password,map.get("username"));
+
+        responseResult.setSuccess("ok");
+        responseResult.setCode(200);
+        return responseResult;
+    }
+
+
+    /**
      * 获取滑动验证码
      */
     @RequestMapping("getCode")
@@ -176,6 +309,7 @@ public class UserController {
     }
 
 
+    //折线图
     @RequestMapping("selectzhexian")
     @ResponseBody
     public ResponseResult selectzhexian(){
