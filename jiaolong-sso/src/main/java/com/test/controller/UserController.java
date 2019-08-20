@@ -95,8 +95,12 @@ public class UserController {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
                     //获取当前时间
                     String format = sdf.format(new Date());
-                    //自增1
-                    redisTemplate.opsForHash().increment("number",format,1l);
+                    redisTemplate.opsForHash().increment("loginName", user.getLoginName(), 1l);
+                    String loginName =(String) redisTemplate.opsForHash().get("loginName", user.getLoginName());
+                    if(loginName.equals("1")){
+                        //自增1
+                        redisTemplate.opsForHash().increment("number", format, 1l);
+                    }
                     //获取集合大小
                     int length = redisTemplate.opsForList().range("date", 0, -1).size();
                     //获取集合最后一个元素
@@ -257,10 +261,9 @@ public class UserController {
     public ResponseResult updatePassword(@RequestBody Map<String,String> map){
         ResponseResult responseResult = ResponseResult.getResponseResult();
         String password = MD5.encryptPassword(map.get("pwd"), "lcg");
-        System.out.println("++/"+password);
-        System.out.println("/*-+"+map.get("username"));
         userService.updatePassword(password,map.get("username"));
-
+        System.out.println("++/"+password);
+        System.out.println("/*-+");
         responseResult.setSuccess("ok");
         responseResult.setCode(200);
         return responseResult;

@@ -31,7 +31,7 @@ public interface RoleDao {
 
     void delUserByRole(@Param(value = "userId") Long userId);
 
-    RoleInfo findRoleByUser(Integer id);
+    RoleInfo findRoleByUser(@Param(value = "id") Integer id);
 
     RoleInfo selectRoleByUser(Long id);
 

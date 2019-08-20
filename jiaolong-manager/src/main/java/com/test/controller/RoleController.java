@@ -38,6 +38,7 @@ public class RoleController {
      * @return
      */
     @RequestMapping("liebiaoRole")
+    @ApiOperation("展示用户绑定中下拉框的角色")
     public List<RoleInfo> liebiaoRole(){
         List<RoleInfo> list=roleService.liebiaoRole();
         return list;
@@ -49,6 +50,7 @@ public class RoleController {
      * @return
      */
     @RequestMapping("bangdingRole")
+    @ApiOperation("用户绑定角色")
     public int  bangdingRole(@RequestBody Map<String,Object> map){
         System.out.println("---------------"+map.get("userId"));
         System.out.println("-----------"+map.get("roleId"));
@@ -65,6 +67,7 @@ public class RoleController {
      * 带分页的角色列表
      */
     @RequestMapping("roleByPage")
+    @ApiOperation("分页展示角色列表")
     public PageInfo<RoleInfo> roleByPage(@RequestBody  Map<String,Object> map){
         PageInfo<RoleInfo> pageInfo=roleService.roleByPage(
                 Integer.valueOf(map.get("page").toString()),
@@ -77,6 +80,7 @@ public class RoleController {
     }
 
     @RequestMapping("selectRoleByUser")
+    @ApiOperation("根据id查询角色")
     public RoleInfo selectRoleByUser(@RequestBody Map<String,Object> map){
         RoleInfo roleInfo=roleService.selectRoleByUser(Long.valueOf(map.get("id").toString()));
         System.out.println("///***0"+roleInfo);
@@ -87,6 +91,7 @@ public class RoleController {
      * 角色添加
      */
     @RequestMapping("addRole")
+    @ApiOperation("角色添加")
     public ResponseResult addRole(@RequestBody Map<String,Object> map){
         ResponseResult responseResult = ResponseResult.getResponseResult();
         System.out.println("*********"+map);
@@ -104,30 +109,27 @@ public class RoleController {
     /**
      * 角色删除
      */
-   /* @RequestMapping("delRole")
-    public void delRole(@RequestBody Map<String,Object> map){
+    @RequestMapping("delRole")
+    public ResponseResult delRole(@RequestBody Map<String,Object> map){
         System.out.println(map);
         ResponseResult responseResult = ResponseResult.getResponseResult();
         RoleInfo roleInfo = roleService.findRoleByUser(Integer.valueOf(map.get("id").toString()));
-        System.out.println("///////"+menuByRole.getRoleName());
-        if(menuByRole.getRoleName()!=null){
+        if(roleInfo.getUserName()!=null){
             responseResult.setCode(500);
-            responseResult.setResult(menuByRole.getRoleName());
+            responseResult.setResult(roleInfo.getUserName());
         }else {
-            menuService.deleteMenu(Long.valueOf(map.get("id").toString()));
-            menuService.deleteMenuByRole(Integer.valueOf(map.get("id").toString()));
+            roleService.delRole(Long.valueOf(map.get("id").toString()));
             responseResult.setSuccess("ok");
             responseResult.setCode(200);
         }
         return responseResult;
-       *//* roleService.delRole(roleInfo.getId());
-        roleService.delUserRole(roleInfo.getId());*//*
-    }*/
+    }
 
     /**
      * 编辑角色权限
      */
     @RequestMapping("updateRole")
+    @ApiOperation("编辑角色权限")
     public Object updateRole(@RequestBody Map<String,Object> map){
         System.out.println("//////"+map);
 //        System.out.println("++++"+map.get("tree"));

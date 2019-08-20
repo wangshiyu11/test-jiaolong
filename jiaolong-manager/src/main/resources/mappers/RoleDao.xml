@@ -51,7 +51,9 @@
     </delete>
 
     <select id="findRoleByUser" resultType="com.test.entity.RoleInfo">
-        select * from base_user_role bur where bur.roleId=#{id}
+        select br.*,GROUP_CONCAT(bu.userName) userName
+        from base_role br LEFT JOIN base_user_role bur on bur.roleId=br.id
+                          LEFT JOIN base_user bu on bu.id=bur.userId where br.id=#{id}
     </select>
 
     <select id="selectRoleByUser" resultType="com.test.entity.RoleInfo">

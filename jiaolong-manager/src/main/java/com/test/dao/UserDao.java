@@ -25,4 +25,6 @@ public interface UserDao{
     int update(User user);
 
     int findByloginName(String loginName);
+
+    User findUserByRole(Integer id);
 }

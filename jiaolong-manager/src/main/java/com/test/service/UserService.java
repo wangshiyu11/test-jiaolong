@@ -51,5 +51,9 @@ public class UserService {
     public int findByloginName(String loginName) {
          return userDao.findByloginName(loginName);
     }
+
+    public User findUserByRole(Integer id) {
+        return userDao.findUserByRole(id);
+    }
 }
 

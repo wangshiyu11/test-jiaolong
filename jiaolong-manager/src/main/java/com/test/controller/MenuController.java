@@ -4,6 +4,7 @@ import com.test.ResponseResult;
 import com.test.dao.MenuDao;
 import com.test.entity.MenuInfo;
 import com.test.service.MenuService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,12 +26,14 @@ public class MenuController {
     MenuService menuService;
 
     @RequestMapping("menuList")
+    @ApiOperation("根据角色id菜单列表")
     public List<MenuInfo> menuList(@RequestBody Map<String,Object> map ){
         List<MenuInfo> list= menuService.findMenu(Long.valueOf(map.get("roleid").toString()));
         return list;
     }
 
     @RequestMapping("menuByList")
+    @ApiOperation("菜单列表")
     public List<MenuInfo> menuByList(){
         List<MenuInfo> list= menuService.menuByList();
         return list;
@@ -38,6 +41,7 @@ public class MenuController {
 
     @RequestMapping("insertMenu")
     @ResponseBody
+    @ApiOperation("添加菜单")
     public ResponseResult insertMenu(@RequestBody Map<String,Object> map){
         ResponseResult responseResult = ResponseResult.getResponseResult();
         menuService.insertMenu(
@@ -54,6 +58,7 @@ public class MenuController {
 
     @RequestMapping("deleteMenu")
     @ResponseBody
+    @ApiOperation("删除菜单")
     public ResponseResult deleteMenu(@RequestBody Map<String,Object> map){
         ResponseResult responseResult = ResponseResult.getResponseResult();
         MenuInfo menuByRole = menuService.findMenuByRole(Integer.valueOf(map.get("id").toString()));
@@ -72,6 +77,7 @@ public class MenuController {
 
     @RequestMapping("updateMenu")
     @ResponseBody
+    @ApiOperation("修改菜单")
     public ResponseResult updateMenu(@RequestBody Map<String,Object> map){
         ResponseResult responseResult = ResponseResult.getResponseResult();
         menuService.updateMenu(

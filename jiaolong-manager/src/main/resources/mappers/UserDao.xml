@@ -38,4 +38,10 @@
     <select id="findByloginName" resultType="com.test.entity.User">
         select * from base_user where loginName=#{loginName}
     </select>
+
+    <select id="findUserByRole" resultType="com.test.entity.User">
+        select bu.*,GROUP_CONCAT(br.roleName) roleName
+        from base_user bu LEFT JOIN base_user_role bur on bur.userId=bu.id
+                          LEFT JOIN base_role br on br.id=bur.roleId where bu.id=#{id}
+    </select>
 </mapper>

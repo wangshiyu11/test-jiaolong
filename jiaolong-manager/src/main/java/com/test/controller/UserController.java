@@ -60,6 +60,7 @@ public class UserController {
      */
     @RequestMapping("userByList")
     @ResponseBody
+    @ApiOperation("分页展示用户列表")
     public PageInfo<User> userList(@RequestBody Map<String,Object> map){
         System.out.println("-----------分页-------------");
         System.out.println("++++++++++++"+map.get("xingbie"));
@@ -108,8 +109,19 @@ public class UserController {
      */
     @RequestMapping("del")
     @ResponseBody
-    public void del(@RequestBody User user){
-        userService.del(user.getId());
+    @ApiOperation("用户删除")
+    public ResponseResult del(@RequestBody Map<String,Object> map){
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        User user = userService.findUserByRole(Integer.valueOf(map.get("id").toString()));
+        if(user.getRoleName()!=null){
+            responseResult.setCode(500);
+            responseResult.setResult(user.getRoleName());
+        }else {
+            userService.del(Long.valueOf(map.get("id").toString()));
+            responseResult.setSuccess("ok");
+            responseResult.setCode(200);
+        }
+        return responseResult;
     }
 
     /**
@@ -117,6 +129,7 @@ public class UserController {
      */
     @RequestMapping("add")
     @ResponseBody
+    @ApiOperation("用户添加")
     public int add(@RequestBody User user){
         System.out.println("----------"+user);
         if(user!=null){
@@ -138,6 +151,7 @@ public class UserController {
      */
     @RequestMapping("update")
     @ResponseBody
+    @ApiOperation("用户修改")
     public int update(@RequestBody User user){
         if(user!=null){
             String password = MD5.encryptPassword(user.getPassword(), "lcg");
@@ -153,6 +167,7 @@ public class UserController {
 
     @RequestMapping("findByloginName")
     @ResponseBody
+    @ApiOperation("根据登录名查找")
     public int  findByloginName(@RequestBody Map<String,Object> map){
         System.out.println(map.get("loginName").toString());
         int i=userService.findByloginName(map.get("loginName").toString());
@@ -221,6 +236,7 @@ public class UserController {
 
 
     @RequestMapping("addExcel")
+    @ResponseBody
     @ApiOperation("这是 UserInfoController 上传文件的方法")
     public void addExcel(@RequestParam("file") MultipartFile file) throws IOException {
         InputStream inputStream = file.getInputStream();
